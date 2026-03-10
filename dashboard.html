@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>RouteX Dashboard</title>
+<link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+<aside class="sidebar">
+
+<h2>RouteX</h2>
+
+<button onclick="go('map-editor.html')">Map Editor</button>
+<button onclick="go('analytics.html')">Visitor Analytics</button>
+<button onclick="go('qr.html')">Generate QR</button>
+<button onclick="logout()">Logout</button>
+
+</aside>
+
+<main class="main">
+
+<h1>Dashboard</h1>
+
+<div class="stats">
+
+<div class="card">
+<h3 id="visitorsToday">0</h3>
+<p>Visitors Today</p>
+</div>
+
+<div class="card">
+<h3 id="totalRoutes">0</h3>
+<p>Total Navigations</p>
+</div>
+
+</div>
+
+<div class="activity">
+
+<h2>Recent Navigation</h2>
+
+<ul id="activityList"></ul>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="../js/dashboard.js"></script>
+
+</body>
+</html>
