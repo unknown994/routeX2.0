@@ -1,58 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
 
-<title>RouteX Dashboard</title>
-<link rel="stylesheet" href="../css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard - RouteX</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<!-- QR Code Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 </head>
 
+
 <body>
 
-<div class="dashboard">
+<nav>
 
-<aside class="sidebar">
+<div class="logo">📍 Route<span>X</span></div>
 
-<h2>RouteX</h2>
+<div class="nav-links">
+<a href="dashboard.html" class="active">Dashboard</a>
+<a href="map.html">View Map</a>
+<button class="btn-logout" onclick="Auth.logout()">Logout</button>
+</div>
 
-<button onclick="go('map-editor.html')">Map Editor</button>
-<button onclick="go('analytics.html')">Visitor Analytics</button>
-<button onclick="go('qr.html')">Generate QR</button>
-<button onclick="logout()">Logout</button>
+</nav>
 
-</aside>
 
-<main class="main">
+<div class="container">
 
-<h1>Dashboard</h1>
+<h2 style="margin-bottom:2rem;">
+Welcome, <span id="user-name"></span>!
+</h2>
 
-<div class="stats">
+
+<div class="grid">
+
+<!-- QR Section -->
 
 <div class="card">
-<h3 id="visitorsToday">0</h3>
-<p>Visitors Today</p>
+
+<h3>📱 Scan QR Code</h3>
+
+<p style="font-size:0.85rem;color:var(--text-light);margin-bottom:1rem;">
+Scan the QR code from the admin to load the building map.
+</p>
+
+<div id="qr-scan-area"
+style="
+text-align:center;
+padding:2rem;
+background:#f1f5f9;
+border-radius:8px;
+min-height:180px;
+display:flex;
+align-items:center;
+justify-content:center;
+">
+
+<p id="qr-placeholder">Waiting for map QR code...</p>
+
 </div>
+
+</div>
+
+
+<!-- Stats Section -->
 
 <div class="card">
-<h3 id="totalRoutes">0</h3>
-<p>Total Navigations</p>
+
+<h3>📊 Navigation Stats</h3>
+
+<div class="stat-card" style="margin-top:1rem;">
+<div class="stat-number" id="total-locations">0</div>
+<p>Available Locations</p>
+</div>
+
+<div class="stat-card" style="margin-top:1rem;">
+<div class="stat-number" id="path-count">0</div>
+<p>Paths Calculated</p>
 </div>
 
 </div>
 
-<div class="activity">
-
-<h2>Recent Navigation</h2>
-
-<ul id="activityList"></ul>
+</div>
 
 </div>
 
-</main>
 
-</div>
+<script src="auth.js"></script>
+<script src="storage.js"></script>
+<script src="dashboard.js"></script>
 
-<script src="../js/dashboard.js"></script>
+<script>
+
+/* Page Protection */
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+if(!Auth.isAuthenticated()){
+window.location.href="login.html";
+return;
+}
+
+/* Display username */
+
+const user=Auth.getCurrentUser();
+document.getElementById("user-name").textContent=user.username;
+
+/* Load locations count */
+
+const locations=Storage.getLocations();
+document.getElementById("total-locations").textContent=locations.length;
+
+});
+
+</script>
 
 </body>
 </html>

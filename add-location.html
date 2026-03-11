@@ -1,65 +1,226 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 <meta charset="UTF-8">
-<title>Add Locations - RouteX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Add Location - RouteX</title>
 
 <link rel="stylesheet" href="css/style.css">
-
-<style>
-body{
-font-family:Arial, sans-serif;
-text-align:center;
-background:#f4f6f8;
-}
-
-h1{
-margin-top:30px;
-}
-
-#mapContainer{
-position:relative;
-display:inline-block;
-margin-top:20px;
-}
-
-#mapImage{
-width:900px;
-max-width:100%;
-border-radius:10px;
-box-shadow:0 10px 25px rgba(0,0,0,0.2);
-}
-
-.marker{
-position:absolute;
-width:14px;
-height:14px;
-background:red;
-border-radius:50%;
-transform:translate(-50%,-50%);
-cursor:pointer;
-}
-
-</style>
 
 </head>
 
 <body>
 
-<h1>Mark Important Locations</h1>
+<nav>
 
-<input type="file" id="mapUpload" accept="image/*">
+<div class="logo">📍 Route<span>X</span></div>
 
-<br><br>
+<div class="nav-links">
+<a href="admin.html">Dashboard</a>
+<a href="add-location.html" class="active">Add Location</a>
+<button class="btn-logout" onclick="Auth.logout()">Logout</button>
+</div>
 
-<div id="mapContainer">
+</nav>
 
-<img id="mapImage" src="images/campus-map.png">
+
+<div class="container">
+
+<div class="card" style="max-width:600px;margin:2rem auto;">
+
+<h2 style="margin-bottom:1.5rem;">Add New Location</h2>
+
+<div id="alert-box"></div>
+
+<form id="location-form">
+
+<div class="form-group">
+
+<label>Location Name</label>
+
+<input
+type="text"
+id="loc-name"
+placeholder="e.g., Main Entrance"
+maxlength="40"
+required
+>
 
 </div>
 
-<script src="js/admin.js"></script>
+
+<div class="grid" style="grid-template-columns:1fr 1fr;gap:1rem;">
+
+<div class="form-group">
+<label>X Position (0-100)</label>
+<input
+type="number"
+id="loc-x"
+min="0"
+max="100"
+step="1"
+placeholder="50"
+required
+>
+</div>
+
+<div class="form-group">
+<label>Y Position (0-100)</label>
+<input
+type="number"
+id="loc-y"
+min="0"
+max="100"
+step="1"
+placeholder="50"
+required
+>
+</div>
+
+</div>
+
+
+<button type="submit">Save Location</button>
+
+</form>
+
+<hr style="margin:2rem 0;">
+
+
+<h3>Existing Locations</h3>
+
+<ul id="location-preview" style="list-style:none;padding:0;"></ul>
+
+</div>
+
+</div>
+
+
+<script src="auth.js"></script>
+<script src="storage.js"></script>
+
+
+<script>
+
+/* ---------- SECURITY CHECK ---------- */
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+if(!Auth.isAuthenticated()){
+window.location.href="login.html";
+return;
+}
+
+const user=Auth.getCurrentUser();
+
+if(user.role!=="admin"){
+alert("Access denied");
+window.location.href="dashboard.html";
+return;
+}
+
+renderLocations();
+
+});
+
+
+/* ---------- ADD LOCATION ---------- */
+
+document.getElementById("location-form").addEventListener("submit",(e)=>{
+
+e.preventDefault();
+
+const alertBox=document.getElementById("alert-box");
+
+const name=document.getElementById("loc-name").value.trim();
+
+const x=parseInt(document.getElementById("loc-x").value);
+
+const y=parseInt(document.getElementById("loc-y").value);
+
+
+/* Validate name */
+
+if(name.length<2){
+alertBox.innerHTML='<div class="alert alert-error">Location name too short</div>';
+return;
+}
+
+
+/* Validate coordinates */
+
+if(isNaN(x)||isNaN(y)||x<0||x>100||y<0||y>100){
+
+alertBox.innerHTML='<div class="alert alert-error">Coordinates must be between 0 and 100</div>';
+return;
+
+}
+
+
+/* Prevent duplicates */
+
+const locs=Storage.getLocations();
+
+if(locs.some(l=>l.name.toLowerCase()===name.toLowerCase())){
+
+alertBox.innerHTML='<div class="alert alert-error">Location already exists</div>';
+return;
+
+}
+
+
+/* Create location */
+
+const newLoc={
+id:Date.now(),
+name:name,
+x:x,
+y:y
+};
+
+locs.push(newLoc);
+
+Storage.saveLocations(locs);
+
+
+/* Success */
+
+alertBox.innerHTML='<div class="alert alert-success">Location saved successfully!</div>';
+
+document.getElementById("location-form").reset();
+
+renderLocations();
+
+});
+
+
+/* ---------- SHOW EXISTING LOCATIONS ---------- */
+
+function renderLocations(){
+
+const list=document.getElementById("location-preview");
+
+const locs=Storage.getLocations();
+
+if(locs.length===0){
+
+list.innerHTML="<li>No locations added yet.</li>";
+
+return;
+
+}
+
+list.innerHTML=locs.map(loc=>
+
+`<li>${loc.name} (${loc.x}, ${loc.y})</li>`
+
+).join("");
+
+}
+
+</script>
 
 </body>
 

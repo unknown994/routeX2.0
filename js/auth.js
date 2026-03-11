@@ -1,48 +1,201 @@
-const registerForm=document.getElementById("registerForm");
+const Auth = {
 
-if(registerForm){
+storageKeyUsers: "routeX_users",
+storageKeySession: "routeX_session",
 
-registerForm.addEventListener("submit",e=>{
+/* ---------- Simple Hash (demo level) ---------- */
 
-e.preventDefault();
+hash(password){
 
-const name=document.getElementById("name").value;
-const email=document.getElementById("email").value;
-const password=document.getElementById("password").value;
+return btoa(password.split("").reverse().join(""));
 
-Storage.saveUser({name,email,password});
+},
 
-alert("Account created");
+/* ---------- User Storage ---------- */
 
-window.location="login.html";
+getUsers(){
 
-});
-}
+try{
 
-const loginForm=document.getElementById("loginForm");
+const data = localStorage.getItem(this.storageKeyUsers);
 
-if(loginForm){
+return data ? JSON.parse(data) : [];
 
-loginForm.addEventListener("submit",e=>{
+}catch{
 
-e.preventDefault();
-
-const email=document.getElementById("email").value;
-const password=document.getElementById("password").value;
-
-const user=Storage.findUser(email,password);
-
-if(user){
-
-localStorage.setItem("session",JSON.stringify(user));
-
-window.location="admin.html";
-
-}else{
-
-alert("Invalid login");
+return [];
 
 }
 
-});
+},
+
+saveUsers(users){
+
+localStorage.setItem(
+this.storageKeyUsers,
+JSON.stringify(users)
+);
+
+},
+
+/* ---------- Register ---------- */
+
+register(username,password){
+
+username = username.trim().toLowerCase();
+
+if(!username || !password){
+
+return {success:false,msg:"All fields are required"};
+
 }
+
+if(username.length < 3){
+
+return {success:false,msg:"Username must be at least 3 characters"};
+
+}
+
+/* Username validation */
+
+const usernameRegex = /^[a-z0-9_]+$/;
+
+if(!usernameRegex.test(username)){
+
+return {
+success:false,
+msg:"Username can only contain letters, numbers, and _"
+};
+
+}
+
+if(password.length < 6){
+
+return {success:false,msg:"Password must be at least 6 characters"};
+
+}
+
+const users = this.getUsers();
+
+/* Check duplicates */
+
+if(users.some(u=>u.username===username)){
+
+return {success:false,msg:"Username already exists"};
+
+}
+
+/* Create user */
+
+const newUser = {
+
+username:username,
+password:this.hash(password),
+role:"user"
+
+};
+
+users.push(newUser);
+
+this.saveUsers(users);
+
+return {success:true,msg:"Registration successful"};
+
+},
+
+/* ---------- Login ---------- */
+
+login(username,password){
+
+username = username.trim().toLowerCase();
+
+const users = this.getUsers();
+
+const hashed = this.hash(password);
+
+const user = users.find(
+
+u => u.username===username && u.password===hashed
+
+);
+
+if(!user){
+
+return {success:false,msg:"Invalid username or password"};
+
+}
+
+const session = {
+
+username:user.username,
+role:user.role,
+loginTime:Date.now()
+
+};
+
+localStorage.setItem(
+
+this.storageKeySession,
+JSON.stringify(session)
+
+);
+
+return {success:true};
+
+},
+
+/* ---------- Logout ---------- */
+
+logout(){
+
+localStorage.removeItem(this.storageKeySession);
+
+window.location.href="index.html";
+
+},
+
+/* ---------- Current User ---------- */
+
+getCurrentUser(){
+
+try{
+
+const session = JSON.parse(
+
+localStorage.getItem(this.storageKeySession)
+
+);
+
+if(!session) return null;
+
+/* 12 hour expiry */
+
+const maxAge = 12*60*60*1000;
+
+if(Date.now()-session.loginTime > maxAge){
+
+this.logout();
+
+return null;
+
+}
+
+return session;
+
+}catch{
+
+return null;
+
+}
+
+},
+
+/* ---------- Auth Check ---------- */
+
+isAuthenticated(){
+
+return this.getCurrentUser() !== null;
+
+}
+
+};

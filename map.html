@@ -1,26 +1,57 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-<title>RouteX Navigation</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RouteX Navigation Map</title>
+
 <link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body>
+
+<nav class="navbar">
+
+<div class="logo">
+📍 Route<span class="highlight">X</span>
+</div>
+
+<div class="nav-links">
+
+<a href="dashboard.html">Dashboard</a>
+<a href="map.html" class="active">Map</a>
+
+<button class="btn-secondary" onclick="Auth.logout()">
+Logout
+</button>
+
+</div>
+
+</nav>
 
 <div class="container">
 
 <div class="card">
 
-<h1>Find Location</h1>
+<h2>Indoor Navigation</h2>
 
-<select id="destination"></select>
+<div class="grid-layout">
 
-<br><br>
+<!-- MAP AREA -->
 
-<div class="map-container">
+<div>
 
-<img id="mapImage">
+<div id="map-wrapper">
+
+<canvas id="map-canvas" width="800" height="600"></canvas>
+
+<div class="map-controls">
+
+<button onclick="MapEngine.draw()">Refresh</button>
+<button onclick="MapEngine.setPath([])">Clear Path</button>
 
 </div>
 
@@ -28,10 +59,171 @@
 
 </div>
 
-<script src="js/storage.js"></script>
-<script src="js/map.js"></script>
-<script src="js/astar.js"></script>
+<!-- PATH CONTROL PANEL -->
+
+<div class="card sidebar">
+
+<h3>Select Destination</h3>
+
+<div class="form-group">
+
+<label>Start Point</label>
+
+<select id="start-point">
+<option value="">Select Start</option>
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label>End Point</label>
+
+<select id="end-point">
+<option value="">Select End</option>
+</select>
+
+</div>
+
+<button id="calculate-path-btn" class="btn-primary">
+Calculate Path
+</button>
+
+<div id="path-info" class="path-info"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="auth.js"></script>
+<script src="storage.js"></script>
+<script src="astar.js"></script>
+<script src="map.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+if(!Auth.isAuthenticated()){
+
+window.location.href="login.html"
+return
+
+}
+
+MapEngine.init("map-canvas")
+
+const qrData = Storage.getQR()
+
+if(!qrData){
+
+document.getElementById("map-wrapper").innerHTML =
+"<div class='text-center'>No map data found. Please scan a QR code.</div>"
+
+return
+
+}
+
+try{
+
+const data = JSON.parse(qrData)
+
+if(data.blueprint && data.locations){
+
+MapEngine.loadMap(data.blueprint,data.locations)
+
+populateLocationDropdowns(data.locations)
+
+}else{
+
+throw new Error("Invalid QR data")
+
+}
+
+}catch(e){
+
+document.getElementById("map-wrapper").innerHTML =
+"<div style='color:red'>Error loading map data.</div>"
+
+console.error(e)
+
+}
+
+})
+
+function populateLocationDropdowns(locations){
+
+const startSelect=document.getElementById("start-point")
+const endSelect=document.getElementById("end-point")
+
+locations.forEach(loc=>{
+
+const option1=document.createElement("option")
+option1.value=loc.id
+option1.textContent=loc.name
+
+const option2=document.createElement("option")
+option2.value=loc.id
+option2.textContent=loc.name
+
+startSelect.appendChild(option1)
+endSelect.appendChild(option2)
+
+})
+
+}
+
+document.getElementById("calculate-path-btn").addEventListener("click",()=>{
+
+const startId=document.getElementById("start-point").value
+const endId=document.getElementById("end-point").value
+
+const info=document.getElementById("path-info")
+
+if(!startId || !endId){
+
+info.textContent="Select both start and end points"
+return
+
+}
+
+if(startId===endId){
+
+info.textContent="Start and End cannot be same"
+return
+
+}
+
+const locations=Storage.getLocations()
+
+const startNode=locations.find(l=>l.id==startId)
+const endNode=locations.find(l=>l.id==endId)
+
+if(startNode && endNode){
+
+const path=AStar.findPath(startNode,endNode,locations)
+
+if(path.length>0){
+
+MapEngine.setPath(path)
+
+info.textContent=`Path found (${path.length} nodes)`
+
+}else{
+
+info.textContent="No path found"
+
+}
+
+}
+
+})
+
+</script>
 
 </body>
-
 </html>

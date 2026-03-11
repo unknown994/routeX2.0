@@ -1,35 +1,109 @@
-const Storage={
+const Storage = {
 
-getUsers(){
-return JSON.parse(localStorage.getItem("users"))||[];
+keys: {
+blueprint: "routeX_blueprint",
+locations: "routeX_locations",
+qr: "routeX_qr"
 },
 
-saveUser(user){
-const users=this.getUsers();
-users.push(user);
-localStorage.setItem("users",JSON.stringify(users));
+/* ---------- Blueprint ---------- */
+
+saveBlueprint(imageData){
+
+if(!imageData){
+console.warn("Blueprint image missing");
+return false;
+}
+
+try{
+
+localStorage.setItem(this.keys.blueprint,imageData);
+return true;
+
+}catch(e){
+
+alert("Image too large for LocalStorage. Please upload a smaller blueprint.");
+return false;
+
+}
+
 },
 
-findUser(email,password){
-return this.getUsers().find(
-u=>u.email===email && u.password===password
-);
+getBlueprint(){
+
+return localStorage.getItem(this.keys.blueprint);
+
 },
 
-saveMap(map){
-localStorage.setItem("map",map);
-},
-
-getMap(){
-return localStorage.getItem("map");
-},
+/* ---------- Locations ---------- */
 
 saveLocations(locations){
-localStorage.setItem("locations",JSON.stringify(locations));
+
+if(!Array.isArray(locations)){
+console.warn("Invalid locations format");
+return;
+}
+
+localStorage.setItem(
+this.keys.locations,
+JSON.stringify(locations)
+);
+
 },
 
 getLocations(){
-return JSON.parse(localStorage.getItem("locations"))||[];
-}
+
+try{
+
+const data=localStorage.getItem(this.keys.locations);
+
+return data ? JSON.parse(data) : [];
+
+}catch(e){
+
+console.warn("Locations data corrupted");
+return [];
 
 }
+
+},
+
+/* ---------- QR Data ---------- */
+
+saveQR(qrData){
+
+if(!qrData){
+console.warn("QR data missing");
+return;
+}
+
+localStorage.setItem(this.keys.qr,qrData);
+
+},
+
+getQR(){
+
+return localStorage.getItem(this.keys.qr);
+
+},
+
+/* ---------- Utilities ---------- */
+
+clearData(){
+
+localStorage.removeItem(this.keys.blueprint);
+localStorage.removeItem(this.keys.locations);
+localStorage.removeItem(this.keys.qr);
+
+},
+
+hasMapData(){
+
+return !!(
+this.getBlueprint() &&
+this.getLocations().length
+);
+
+}
+
+};

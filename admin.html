@@ -1,45 +1,95 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-<title>Admin Dashboard</title>
-<link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RouteX Admin Dashboard</title>
+    <link rel="stylesheet" href="css/admin-style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-
 <body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">RouteX Admin</div>
+            <ul class="sidebar-menu">
+                <li><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="#"><i class="fas fa-map-marker-alt"></i> Locations</a></li>
+                <li><a href="#"><i class="fas fa-layer-group"></i> Floors</a></li>
+                <li><a href="#"><i class="fas fa-calendar-alt"></i> Events</a></li>
+                <li><a href="#"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
 
-<nav>
-<h2>RouteX Dashboard</h2>
-<a href="index.html"><button>Logout</button></a>
-</nav>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <h1>Dashboard</h1>
+                <div class="header-right">
+                    <input type="text" placeholder="Search..." class="search-box">
+                    <div class="notification"><i class="fas fa-bell"></i></div>
+                    <div class="profile"><i class="fas fa-user-circle"></i></div>
+                </div>
+            </header>
 
-<div class="container">
+            <!-- Dashboard Cards -->
+            <div class="cards">
+                <div class="card">
+                    <h3>Total Locations</h3>
+                    <p>25</p>
+                </div>
+                <div class="card">
+                    <h3>Total Floors</h3>
+                    <p>10</p>
+                </div>
+                <div class="card">
+                    <h3>Total Events</h3>
+                    <p>18</p>
+                </div>
+                <div class="card">
+                    <h3>Active Users</h3>
+                    <p>120</p>
+                </div>
+            </div>
 
-<div class="card">
+            <!-- Recent Activity Table -->
+            <div class="table-container">
+                <h2>Recent Locations</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Floor</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Main Lobby</td>
+                            <td>1</td>
+                            <td>Active</td>
+                            <td>
+                                <button class="edit"><i class="fas fa-edit"></i></button>
+                                <button class="delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Conference Room</td>
+                            <td>2</td>
+                            <td>Active</td>
+                            <td>
+                                <button class="edit"><i class="fas fa-edit"></i></button>
+                                <button class="delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-<h1>Upload Map</h1>
-
-<input type="file" id="mapUpload">
-
-<br><br>
-
-<a href="add-location.html">
-<button>Add Locations</button>
-</a>
-
-<br><br>
-
-<h2>QR Code</h2>
-
-<div id="qrcode"></div>
-
-</div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-<script src="js/admin.js"></script>
-
+        </main>
+    </div>
 </body>
-
 </html>

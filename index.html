@@ -1,31 +1,266 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<title>RouteX</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RouteX | Smart Indoor Navigation</title>
+
+<meta name="description" content="Navigate hospitals, universities, malls and offices easily with RouteX indoor navigation.">
+
 <link rel="stylesheet" href="css/style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 </head>
 
+<script>
+document.querySelectorAll('a[href^="#"]').forEach(anchor=>{
+anchor.addEventListener("click",function(e){
+e.preventDefault();
+document.querySelector(this.getAttribute("href")).scrollIntoView({
+behavior:"smooth"
+});
+});
+});
+</script>
 <body>
 
-<div class="container">
+<!-- NAVBAR -->
 
-<div class="card">
+<header class="navbar">
 
-<h1>RouteX Indoor Navigation</h1>
+<div class="nav-container">
+
+<div class="logo">
+📍 Route<span>X</span>
+</div>
+
+<nav class="nav-links">
+
+<a href="#features">Features</a>
+<a href="#how">How It Works</a>
+<a href="#about">About</a>
+
+</nav>
+
+<div class="nav-buttons">
+
+<a href="login.html" class="btn-secondary">
+Login
+</a>
+
+<a href="register.html" class="btn-primary">
+Get Started
+</a>
+
+</div>
+
+</div>
+
+</header>
+
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+<div class="hero-content">
+
+<h1>
+Navigate Indoor Spaces  
+<span>Effortlessly</span>
+</h1>
 
 <p>
-Upload building maps and create QR based indoor navigation.
+RouteX helps visitors easily navigate large buildings like hospitals,
+universities, malls, offices, and railway stations.
 </p>
 
-<br>
+<div class="hero-buttons">
 
-<a href="login.html"><button>Login</button></a>
+<a href="login.html" class="btn-primary">
+Start Navigation
+</a>
 
-<a href="register.html"><button>Register</button></a>
+<a href="admin.html" class="btn-secondary">
+Admin Portal
+</a>
 
 </div>
 
 </div>
+
+</section>
+
+
+
+<!-- FEATURES -->
+
+<section id="features" class="features">
+
+<h2>Powerful Features</h2>
+
+<div class="feature-grid">
+
+<div class="feature-card">
+
+<i class="fas fa-map-marked-alt"></i>
+
+<h3>Indoor Maps</h3>
+
+<p>
+Upload building blueprints and visualize navigation paths.
+</p>
+
+</div>
+
+
+<div class="feature-card">
+
+<i class="fas fa-route"></i>
+
+<h3>Smart Routing</h3>
+
+<p>
+RouteX calculates the shortest path between locations.
+</p>
+
+</div>
+
+
+<div class="feature-card">
+
+<i class="fas fa-qrcode"></i>
+
+<h3>QR Based Access</h3>
+
+<p>
+Visitors scan QR codes to instantly open building navigation.
+</p>
+
+</div>
+
+
+<div class="feature-card">
+
+<i class="fas fa-building"></i>
+
+<h3>Multi Building Support</h3>
+
+<p>
+Works for hospitals, universities, malls, industries and stations.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- HOW IT WORKS -->
+
+<section id="how" class="how">
+
+<h2>How RouteX Works</h2>
+
+<div class="steps">
+
+<div class="step">
+
+<span>1</span>
+
+<h3>Admin Uploads Map</h3>
+
+<p>
+Admins upload building blueprints and define locations.
+</p>
+
+</div>
+
+
+<div class="step">
+
+<span>2</span>
+
+<h3>User Scans QR</h3>
+
+<p>
+Visitors scan QR code to open the building map.
+</p>
+
+</div>
+
+
+<div class="step">
+
+<span>3</span>
+
+<h3>Navigate Instantly</h3>
+
+<p>
+RouteX calculates the best path to reach your destination.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ABOUT -->
+
+<section id="about" class="about">
+
+<h2>About RouteX</h2>
+
+<p>
+RouteX is an indoor navigation platform designed to help users
+move efficiently inside complex buildings. Admins upload maps and
+define locations while visitors easily find the shortest route.
+</p>
+
+</section>
+
+
+
+<!-- CTA -->
+
+<section class="cta">
+
+<h2>Start Navigating Smarter Today</h2>
+
+<p>
+Join RouteX and simplify indoor navigation.
+</p>
+
+<a href="register.html" class="btn-primary">
+Create Free Account
+</a>
+
+</section>
+
+
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+<p>
+© 2026 RouteX Indoor Navigation Platform
+</p>
+
+</footer>
+
 
 </body>
 </html>

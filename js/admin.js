@@ -1,89 +1,209 @@
-const mapImage = document.getElementById("mapImage")
-const mapContainer = document.getElementById("mapContainer")
-const uploadInput = document.getElementById("mapUpload")
+const Admin = {
 
-let locations = JSON.parse(localStorage.getItem("locations")) || []
+init(){
 
-/* LOAD SAVED MAP */
-
-const savedMap = localStorage.getItem("routex_map")
-
-if(savedMap){
-mapImage.src = savedMap
+if(!Auth.isAuthenticated()){
+window.location.href="login.html";
+return;
 }
 
-/* UPLOAD NEW MAP */
+const user=Auth.getCurrentUser();
 
-if(uploadInput){
+if(user.role!=="admin"){
+alert("Access denied");
+window.location.href="dashboard.html";
+return;
+}
 
-uploadInput.addEventListener("change", function(e){
+this.bindEvents();
+this.renderLocationList();
+this.loadBlueprintPreview();
 
-const file = e.target.files[0]
+},
 
-if(!file) return
+/* ---------- Event Binding ---------- */
 
-const reader = new FileReader()
+bindEvents(){
 
-reader.onload = function(event){
+const fileInput=document.getElementById("blueprint-upload");
+const addLocBtn=document.getElementById("add-location-btn");
+const qrBtn=document.getElementById("generate-qr-btn");
 
-const imageData = event.target.result
+if(fileInput){
+fileInput.addEventListener("change",(e)=>this.uploadBlueprint(e));
+}
 
-localStorage.setItem("routex_map", imageData)
+if(addLocBtn){
+addLocBtn.addEventListener("click",()=>this.addLocation());
+}
 
-mapImage.src = imageData
+if(qrBtn){
+qrBtn.addEventListener("click",()=>this.generateQR());
+}
+
+},
+
+/* ---------- Blueprint Upload ---------- */
+
+uploadBlueprint(e){
+
+const file=e.target.files[0];
+
+if(!file) return;
+
+/* Validate file type */
+
+const allowed=["image/png","image/jpeg"];
+
+if(!allowed.includes(file.type)){
+alert("Only PNG or JPG images are allowed.");
+return;
+}
+
+/* Validate size (2MB max) */
+
+if(file.size>2*1024*1024){
+alert("Image too large. Please upload under 2MB.");
+return;
+}
+
+const reader=new FileReader();
+
+reader.onload=(event)=>{
+
+if(Storage.saveBlueprint(event.target.result)){
+
+alert("Blueprint uploaded successfully!");
+this.loadBlueprintPreview();
 
 }
 
-reader.readAsDataURL(file)
+};
 
-})
+reader.readAsDataURL(file);
 
-}
+},
 
-/* RENDER MARKERS */
+/* ---------- Blueprint Preview ---------- */
 
-function renderLocations(){
+loadBlueprintPreview(){
 
-document.querySelectorAll(".marker").forEach(marker => marker.remove())
+const preview=document.getElementById("blueprint-preview");
+const blueprint=Storage.getBlueprint();
 
-locations.forEach(loc => {
+if(preview && blueprint){
 
-const marker = document.createElement("div")
-
-marker.className = "marker"
-
-marker.style.left = loc.x + "px"
-marker.style.top = loc.y + "px"
-
-marker.title = loc.name
-
-mapContainer.appendChild(marker)
-
-})
+preview.innerHTML=
+`<img src="${blueprint}" style="max-width:100%;border-radius:6px;margin-top:10px;">`;
 
 }
 
-/* ADD NEW LOCATION */
+},
 
-mapContainer.addEventListener("click", function(e){
+/* ---------- Add Location ---------- */
 
-const rect = mapContainer.getBoundingClientRect()
+addLocation(){
 
-const x = e.clientX - rect.left
-const y = e.clientY - rect.top
+const name=prompt("Enter Location Name (e.g., Cafeteria):");
 
-const name = prompt("Enter location name")
+if(!name || name.trim()==="") return;
 
-if(!name) return
+const newLoc={
+id:Date.now(),
+name:name.trim(),
+x:Math.floor(Math.random()*80)+10,
+y:Math.floor(Math.random()*80)+10
+};
 
-const location = {name, x, y}
+const locs=Storage.getLocations();
 
-locations.push(location)
+locs.push(newLoc);
 
-localStorage.setItem("locations", JSON.stringify(locations))
+Storage.saveLocations(locs);
 
-renderLocations()
+this.renderLocationList();
 
-})
+alert(`Location "${newLoc.name}" added.`);
 
-renderLocations()
+},
+
+/* ---------- Render Locations ---------- */
+
+renderLocationList(){
+
+const locList=document.getElementById("location-list");
+
+if(!locList) return;
+
+const locs=Storage.getLocations();
+
+if(locs.length===0){
+
+locList.innerHTML="<li>No locations added yet.</li>";
+
+return;
+
+}
+
+locList.innerHTML=locs.map(loc=>
+`<li>${loc.name} (${loc.x}, ${loc.y})</li>`
+).join("");
+
+},
+
+/* ---------- Generate QR ---------- */
+
+generateQR(){
+
+const blueprint=Storage.getBlueprint();
+
+if(!blueprint){
+alert("Please upload a blueprint first.");
+return;
+}
+
+const locations=Storage.getLocations();
+
+const qrData=JSON.stringify({
+blueprint,
+locations
+});
+
+Storage.saveQR(qrData);
+
+const qrContainer=document.getElementById("qr-display");
+
+if(!qrContainer) return;
+
+qrContainer.innerHTML="";
+
+try{
+
+new QRCode(qrContainer,{
+text:qrData,
+width:200,
+height:200,
+colorDark:"#000000",
+colorLight:"#ffffff",
+correctLevel:QRCode.CorrectLevel.H
+});
+
+}catch(e){
+
+console.error("QR generation failed",e);
+qrContainer.innerHTML="<p style='color:red'>QR generation failed.</p>";
+
+}
+
+}
+
+};
+
+
+/* Initialize */
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+Admin.init();
+
+});
